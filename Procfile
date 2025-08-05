@@ -1,1 +1,1 @@
-web: streamlit run high_no_explanation_optimized.py --server.port $PORT --server.address 0.0.0.0 --server.headless true --server.enableCORS false --server.enableXsrfProtection false
+web: python run.py 
