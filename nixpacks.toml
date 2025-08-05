@@ -1,8 +1,0 @@
-[phases.setup]
-nixPkgs = ["python311", "cairo", "pango", "gdk-pixbuf", "libffi", "shared-mime-info"]
-
-[phases.install]
-cmds = ["pip install -r requirements.txt"]
-
-[start]
-cmd = "streamlit run app.py --server.port $PORT --server.address 0.0.0.0 --server.headless true --server.fileWatcherType none --browser.gatherUsageStats false"
