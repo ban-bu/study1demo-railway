@@ -1,0 +1,283 @@
+{% extends "base.html" %}
+
+{% block title %}AI T恤设计生成器 - 首页{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- 左侧：设计展示区 -->
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title mb-4">
+                    <i class="fas fa-tshirt"></i> T恤设计预览
+                </h4>
+                
+                <!-- 设计展示区域 -->
+                <div id="designArea" class="design-area text-center">
+                    <div id="loadingDesign" style="display: none;">
+                        <div class="spinner-border mb-3" role="status">
+                            <span class="visually-hidden">生成中...</span>
+                        </div>
+                        <h5>AI正在生成您的设计...</h5>
+                        <p class="text-muted">请耐心等待，不要关闭页面</p>
+                        
+                        <!-- 进度条 -->
+                        <div class="progress mt-3">
+                            <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated" 
+                                 role="progressbar" style="width: 0%"></div>
+                        </div>
+                        <div id="progressText" class="mt-2 text-muted"></div>
+                    </div>
+                    
+                    <div id="originalTshirt">
+                        <img src="/api/get_base_tshirt" alt="原始T恤" class="img-fluid" style="max-height: 400px;">
+                        <h5 class="mt-3">开始设计您的专属T恤</h5>
+                        <p class="text-muted">输入关键词，AI将为您生成独特的设计</p>
+                    </div>
+                </div>
+                
+                <!-- 生成的设计展示 -->
+                <div id="designGallery" class="design-gallery" style="display: none;">
+                    <!-- 动态加载设计 -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 右侧：控制面板 -->
+    <div class="col-lg-4">
+        <!-- 信息卡片 -->
+        <div class="info-card">
+            <h5><i class="fas fa-magic"></i> 实验信息</h5>
+            <p class="mb-2">AI将为您生成 <strong id="designCount">{{ design_count }}</strong> 个独特设计</p>
+            <p class="mb-0">推荐级别: <span class="badge bg-light text-dark" id="recommendationLevel">{{ recommendation_level }}</span></p>
+        </div>
+        
+        <!-- 设计选项 -->
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-palette"></i> 设计选项
+                </h5>
+                
+                <!-- 关键词输入 -->
+                <div class="mb-3">
+                    <label for="keywords" class="form-label">描述您想要的T恤设计:</label>
+                    <div class="alert alert-info py-2">
+                        <small>
+                            <i class="fas fa-info-circle"></i>
+                            输入关键词描述您理想的T恤设计。我们的AI将结合这些特征为您创建独特的设计。
+                        </small>
+                    </div>
+                    <input type="text" class="form-control" id="keywords" 
+                           placeholder="请只输入一个词" maxlength="50">
+                </div>
+                
+                <!-- 生成按钮 -->
+                <button type="button" class="btn btn-primary btn-lg w-100" id="generateBtn">
+                    <i class="fas fa-dice"></i> 随机生成设计
+                </button>
+                
+                <!-- 消息区域 -->
+                <div id="messageArea" class="mt-3"></div>
+            </div>
+        </div>
+        
+        <!-- 统计信息 -->
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">
+                    <i class="fas fa-chart-bar"></i> 会话统计
+                </h6>
+                <div class="row">
+                    <div class="col-6">
+                        <div class="stat-card">
+                            <div class="stat-number" id="sessionDesignCount">0</div>
+                            <div class="stat-label">已生成设计</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="stat-card">
+                            <div class="stat-number" id="generationTime">0s</div>
+                            <div class="stat-label">生成时间</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    let isGenerating = false;
+    let currentDesigns = [];
+    
+    // 加载会话信息
+    loadSessionInfo();
+    
+    // 生成按钮点击事件
+    $('#generateBtn').click(function() {
+        if (isGenerating) return;
+        
+        const keywords = $('#keywords').val().trim();
+        if (!keywords) {
+            showMessage('请输入至少一个关键词', 'danger');
+            return;
+        }
+        
+        generateDesigns(keywords);
+    });
+    
+    // Enter键生成
+    $('#keywords').keypress(function(e) {
+        if (e.which === 13) {
+            $('#generateBtn').click();
+        }
+    });
+    
+    function loadSessionInfo() {
+        $.get('/api/session_info', function(data) {
+            $('#designCount').text(data.design_count);
+            $('#recommendationLevel').text(data.recommendation_level);
+            $('#sessionDesignCount').text(data.generated_designs_count);
+        });
+    }
+    
+    function generateDesigns(keywords) {
+        isGenerating = true;
+        $('#generateBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> 生成中...');
+        
+        // 显示加载界面
+        $('#originalTshirt').hide();
+        $('#designGallery').hide();
+        $('#loadingDesign').show();
+        
+        // 重置进度
+        updateProgress(0, `AI正在生成 ${$('#designCount').text()} 个独特设计...`);
+        
+        const startTime = Date.now();
+        
+        // 发送生成请求
+        $.ajax({
+            url: '/api/generate_designs',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ keywords: keywords }),
+            success: function(response) {
+                if (response.success) {
+                    currentDesigns = response.designs;
+                    displayDesigns(response.designs);
+                    
+                    const endTime = Date.now();
+                    const totalTime = Math.round((endTime - startTime) / 1000);
+                    $('#generationTime').text(totalTime + 's');
+                    $('#sessionDesignCount').text(response.design_count);
+                    
+                    showMessage(`成功生成 ${response.design_count} 个设计！耗时 ${response.generation_time.toFixed(1)} 秒`, 'success');
+                } else {
+                    showMessage('生成失败，请重试', 'danger');
+                }
+            },
+            error: function(xhr) {
+                const error = xhr.responseJSON ? xhr.responseJSON.error : '生成失败，请重试';
+                showMessage(error, 'danger');
+            },
+            complete: function() {
+                isGenerating = false;
+                $('#generateBtn').prop('disabled', false).html('<i class="fas fa-dice"></i> 随机生成设计');
+                $('#loadingDesign').hide();
+            }
+        });
+        
+        // 模拟进度更新
+        simulateProgress();
+    }
+    
+    function simulateProgress() {
+        let progress = 0;
+        const interval = setInterval(function() {
+            progress += Math.random() * 15;
+            if (progress >= 90) {
+                progress = 90;
+                clearInterval(interval);
+            }
+            updateProgress(progress, `生成进度: ${Math.round(progress)}%`);
+        }, 1000);
+    }
+    
+    function updateProgress(percentage, text) {
+        $('#progressBar').css('width', percentage + '%');
+        $('#progressText').text(text);
+    }
+    
+    function displayDesigns(designs) {
+        const gallery = $('#designGallery');
+        gallery.empty();
+        
+        designs.forEach(function(design, index) {
+            const designHtml = `
+                <div class="design-item" data-index="${index}">
+                    <img src="/api/get_design_image/${design.filename}" alt="设计 ${index + 1}" 
+                         onerror="this.src='data:image/svg+xml,<svg xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"200\\" height=\\"200\\"><rect width=\\"200\\" height=\\"200\\" fill=\\"%23f8f9fa\\"/><text x=\\"100\\" y=\\"100\\" text-anchor=\\"middle\\" dy=\\".3em\\" fill=\\"%236c757d\\">加载失败</text></svg>'">
+                    <div class="design-label">设计 ${index + 1}</div>
+                </div>
+            `;
+            gallery.append(designHtml);
+        });
+        
+        gallery.show();
+        
+        // 添加点击事件
+        $('.design-item').click(function() {
+            $('.design-item').removeClass('selected');
+            $(this).addClass('selected');
+            
+            const index = $(this).data('index');
+            const design = designs[index];
+            showDesignDetails(design);
+        });
+    }
+    
+    function showDesignDetails(design) {
+        // 可以在这里显示设计详情，比如颜色、面料等信息
+        const info = design.info;
+        let detailsHtml = `
+            <div class="alert alert-info">
+                <h6><i class="fas fa-info-circle"></i> 设计详情</h6>
+                <p><strong>颜色:</strong> ${info.color || '默认'}</p>
+                <p><strong>面料:</strong> ${info.fabric || '棉质'}</p>
+                <p><strong>位置:</strong> ${info.placement || '居中'}</p>
+                <p class="mb-0"><strong>尺寸:</strong> ${info.size || '中等'}</p>
+            </div>
+        `;
+        
+        showMessage(detailsHtml, 'info', false);
+    }
+    
+    function showMessage(message, type, autoDismiss = true) {
+        const alertClass = `alert-${type}`;
+        const icon = type === 'success' ? 'check-circle' : 
+                    type === 'danger' ? 'exclamation-triangle' : 
+                    type === 'warning' ? 'exclamation-circle' : 'info-circle';
+        
+        const alertHtml = `
+            <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+                <i class="fas fa-${icon}"></i> ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        `;
+        
+        $('#messageArea').html(alertHtml);
+        
+        if (autoDismiss && type === 'success') {
+            setTimeout(function() {
+                $('.alert').alert('close');
+            }, 5000);
+        }
+    }
+});
+</script>
+{% endblock %}

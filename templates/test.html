@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}测试页面 - AI T恤设计生成器{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-body text-center">
+                <h2 class="text-success mb-4">
+                    <i class="fas fa-check-circle"></i> 
+                    Flask应用运行正常！
+                </h2>
+                
+                <p class="lead">如果你能看到这个页面，说明Flask应用在Railway上运行正常！</p>
+                
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h5><i class="fas fa-server"></i> 服务器信息</h5>
+                                <p><strong>框架:</strong> Flask</p>
+                                <p><strong>Python版本:</strong> {{ python_version }}</p>
+                                <p class="mb-0"><strong>运行环境:</strong> Railway</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h5><i class="fas fa-cogs"></i> 功能状态</h5>
+                                <p><strong>API接口:</strong> <span class="text-success">正常</span></p>
+                                <p><strong>图像处理:</strong> <span class="text-success">正常</span></p>
+                                <p class="mb-0"><strong>AI模型:</strong> <span class="text-success">正常</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <a href="/" class="btn btn-primary btn-lg">
+                        <i class="fas fa-arrow-left"></i> 返回首页
+                    </a>
+                    <button class="btn btn-outline-primary btn-lg ms-2" onclick="testAPI()">
+                        <i class="fas fa-flask"></i> 测试API
+                    </button>
+                </div>
+                
+                <div id="apiTestResult" class="mt-3"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function testAPI() {
+    $('#apiTestResult').html(`
+        <div class="alert alert-info">
+            <i class="fas fa-spinner fa-spin"></i> 正在测试API连接...
+        </div>
+    `);
+    
+    $.get('/api/session_info')
+        .done(function(data) {
+            $('#apiTestResult').html(`
+                <div class="alert alert-success">
+                    <h6><i class="fas fa-check-circle"></i> API测试成功！</h6>
+                    <p><strong>用户ID:</strong> ${data.user_id}</p>
+                    <p><strong>设计数量:</strong> ${data.design_count}</p>
+                    <p class="mb-0"><strong>推荐级别:</strong> ${data.recommendation_level}</p>
+                </div>
+            `);
+        })
+        .fail(function() {
+            $('#apiTestResult').html(`
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle"></i> API测试失败
+                </div>
+            `);
+        });
+}
+</script>
+{% endblock %}
