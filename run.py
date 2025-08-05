@@ -11,13 +11,7 @@ import subprocess
 def main():
     """主启动函数"""
     # 获取Railway环境变量
-    port = os.environ.get('PORT', '8000')
-    
-    # 设置Streamlit环境变量
-    os.environ.setdefault('STREAMLIT_SERVER_PORT', port)
-    os.environ.setdefault('STREAMLIT_SERVER_ADDRESS', '0.0.0.0')
-    os.environ.setdefault('STREAMLIT_SERVER_HEADLESS', 'true')
-    os.environ.setdefault('STREAMLIT_BROWSER_GATHER_USAGE_STATS', 'false')
+    port = int(os.environ.get('PORT', '8000'))
     
     print(f"🚀 启动AI T恤设计生成器...")
     print(f"📡 端口: {port}")
@@ -32,7 +26,9 @@ def main():
             '--server.headless=true',
             '--browser.gatherUsageStats=false',
             '--server.enableCORS=false',
-            '--server.enableXsrfProtection=false'
+            '--server.enableXsrfProtection=false',
+            '--server.allowRunOnSave=false',
+            '--server.runOnSave=false'
         ], check=True)
     except subprocess.CalledProcessError as e:
         print(f"❌ 启动失败: {e}")
