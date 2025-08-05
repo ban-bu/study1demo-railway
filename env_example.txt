@@ -1,36 +1,13 @@
-# Railway部署环境变量示例
-# 复制此文件为.env并在Railway中设置这些变量
-
-# 端口配置
-PORT=8000
-
-# OpenAI API配置 - 多个密钥用于轮询
-OPENAI_API_KEY_1=sk-lNVAREVHjj386FDCd9McOL7k66DZCUkTp6IbV0u9970qqdlg
-OPENAI_API_KEY_2=sk-y8x6LH0zdtyQncT0aYdUW7eJZ7v7cuKTp90L7TiK3rPu3fAg
-OPENAI_API_KEY_3=sk-Kp59pIj8PfqzLzYaAABh2jKsQLB0cUKU3n8l7TIK3rpU61QG
-OPENAI_API_KEY_4=sk-KACPocnavR6poutXUaj7HxsqUrxvcV808S2bv0U9974Ec83g
-OPENAI_API_KEY_5=sk-YknuN0pb6fKBOP6xFOqAdeeqhoYkd1cEl9380vC5HHeC2B30
+# OpenAI API配置 - 在Railway项目设置中配置这些环境变量
+OPENAI_API_KEY=your_openai_api_key_here
 OPENAI_BASE_URL=https://api.deepbricks.ai/v1/
 
-# GPT-4o-mini API配置 - 同样使用多个密钥
-GPT4O_MINI_API_KEY_1=sk-lNVAREVHjj386FDCd9McOL7k66DZCUkTp6IbV0u9970qqdlg
-GPT4O_MINI_API_KEY_2=sk-y8x6LH0zdtyQncT0aYdUW7eJZ7v7cuKTp90L7TiK3rPu3fAg
-GPT4O_MINI_API_KEY_3=sk-Kp59pIj8PfqzLzYaAABh2jKsQLB0cUKU3n8l7TIK3rpU61QG
-GPT4O_MINI_API_KEY_4=sk-KACPocnavR6poutXUaj7HxsqUrxvcV808S2bv0U9974Ec83g
-GPT4O_MINI_API_KEY_5=sk-YknuN0pb6fKBOP6xFOqAdeeqhoYkd1cEl9380vC5HHeC2B30
-GPT4O_MINI_BASE_URL=https://api.deepbricks.ai/v1/
+# 阿里云DashScope配置（可选）
+DASHSCOPE_API_KEY=your_dashscope_api_key_here
 
-# DashScope API配置
-DASHSCOPE_API_KEY=sk-4f82c6e2097440f8adb2ef688c7c7551
+# 其他配置
+EXPERIMENT_DATA_FILE=experiment_data.csv
 
-# Streamlit配置
-STREAMLIT_SERVER_PORT=8000
-STREAMLIT_SERVER_ADDRESS=0.0.0.0
-STREAMLIT_SERVER_HEADLESS=true
-STREAMLIT_BROWSER_GATHER_USAGE_STATS=false
-
-# 应用配置
-APP_TITLE=AI T-shirt Design Generator
-APP_ICON=👕
-DESIGN_COUNT_MIN=1
-DESIGN_COUNT_MAX=10 
+# Railway会自动设置以下变量，无需手动配置：
+# PORT - Railway自动分配的端口
+# RAILWAY_ENVIRONMENT - 部署环境标识 

@@ -31,9 +31,15 @@ from streamlit.components.v1 import html
 from streamlit_drawable_canvas import st_canvas
 
 # 导入OpenAI配置
+import os
+from dotenv import load_dotenv
+
+# 加载环境变量
+load_dotenv()
+
 from openai import OpenAI
-API_KEY = "sk-lNVAREVHjj386FDCd9McOL7k66DZCUkTp6IbV0u9970qqdlg"
-BASE_URL = "https://api.deepbricks.ai/v1/"
+API_KEY = os.getenv("OPENAI_API_KEY", "sk-lNVAREVHjj386FDCd9McOL7k66DZCUkTp6IbV0u9970qqdlg")
+BASE_URL = os.getenv("OPENAI_BASE_URL", "https://api.deepbricks.ai/v1/")
 client = OpenAI(api_key=API_KEY, base_url=BASE_URL)
 
 # 导入面料纹理模块

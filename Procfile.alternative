@@ -1,1 +1,0 @@
-web: streamlit run app_railway.py --server.port=$PORT --server.address=:: --server.headless=true --browser.gatherUsageStats=false --server.enableCORS=false --server.enableXsrfProtection=false --server.fileWatcherType=none

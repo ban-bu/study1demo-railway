@@ -7,13 +7,14 @@ Pillow==11.1.0
 # cairosvg==2.7.1
 numpy<2.0.0
 streamlit-image-coordinates==0.2.0
-opencv-python-headless
+opencv-python-headless==4.8.1.78
 # 添加其他必要依赖
-python-dotenv
+python-dotenv==1.0.0
 # 添加备选SVG处理库
-svglib
-reportlab
-freetype-py
-cairosvg
+svglib==1.5.1
+reportlab==4.0.7
+freetype-py==2.3.0
+cairosvg==2.7.1
 # 添加阿里云DashScope文生图API
-dashscope
+dashscope==1.14.0
+pandas==2.1.4
