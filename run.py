@@ -16,19 +16,23 @@ def main():
     print(f"🚀 启动AI T恤设计生成器...")
     print(f"📡 端口: {port}")
     print(f"🌐 地址: 0.0.0.0")
+    print(f"🏁 Python版本: {sys.version}")
+    print(f"📦 Streamlit: {os.popen('streamlit --version').read().strip()}")
     
     # 启动Streamlit应用
     try:
+        # 确保使用正确的IPv6绑定
         subprocess.run([
             sys.executable, '-m', 'streamlit', 'run', 'app_railway.py',
             f'--server.port={port}',
-            '--server.address=0.0.0.0',
+            '--server.address=::',  # 使用IPv6绑定
             '--server.headless=true',
             '--browser.gatherUsageStats=false',
             '--server.enableCORS=false',
             '--server.enableXsrfProtection=false',
             '--server.allowRunOnSave=false',
-            '--server.runOnSave=false'
+            '--server.runOnSave=false',
+            '--server.fileWatcherType=none'  # 禁用文件监视器
         ], check=True)
     except subprocess.CalledProcessError as e:
         print(f"❌ 启动失败: {e}")

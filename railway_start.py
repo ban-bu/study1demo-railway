@@ -18,16 +18,17 @@ def main():
         "run",
         "app_railway.py",
         f"--server.port={port}",
-        "--server.address=0.0.0.0",
+        "--server.address=::",  # 使用IPv6
         "--server.headless=true",
         "--browser.gatherUsageStats=false",
         "--server.enableCORS=false",
-        "--server.enableXsrfProtection=false"
+        "--server.enableXsrfProtection=false",
+        "--server.fileWatcherType=none"
     ]
     
     print(f"🚀 启动AI T恤设计生成器...")
     print(f"📡 端口: {port}")
-    print(f"🌐 地址: 0.0.0.0")
+    print(f"🌐 地址: :: (IPv6)")
     
     # 直接调用Streamlit
     stcli.main()
