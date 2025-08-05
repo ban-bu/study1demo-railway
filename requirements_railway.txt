@@ -10,4 +10,5 @@ python-dotenv
 svglib
 reportlab
 freetype-py
-dashscope 
+dashscope
+urllib3 
